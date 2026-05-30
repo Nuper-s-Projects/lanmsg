@@ -1,4 +1,3 @@
-#Requires -RunAsAdministrator
 <#
 .SYNOPSIS
   Fast download + install LanMsg from GitHub.
@@ -10,13 +9,54 @@ param(
     [string]$Repo = "Nuper-s-Projects/lanmsg",
     [string]$ReleaseTag = "latest",
     [ValidateSet("auto", "lite", "full")]
-    [string]$Package = "auto"
+    [string]$Package = "auto",
+    [switch]$Elevated
 )
 
+$ScriptUrl = "https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1"
 $ErrorActionPreference = "Stop"
 
-function Write-Step($msg) { Write-Host "[LanMsg] $msg" -ForegroundColor Cyan }
+function Test-IsAdmin {
+    $p = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    return $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
 
+function Request-Admin {
+    Write-Host ""
+    Write-Host "LanMsg needs Administrator access to install." -ForegroundColor Yellow
+    Write-Host "Click Yes on the UAC prompt to continue..." -ForegroundColor Yellow
+    Write-Host ""
+
+    $scriptPath = $PSCommandPath
+    if ([string]::IsNullOrWhiteSpace($scriptPath) -or -not (Test-Path $scriptPath)) {
+        $scriptPath = Join-Path $env:TEMP "LanMsg-install-from-github.ps1"
+        $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+        if ($curl) {
+            & curl.exe -fsSL -o $scriptPath $ScriptUrl
+        } else {
+            (Invoke-WebRequest -Uri $ScriptUrl -UseBasicParsing).Content | Set-Content $scriptPath -Encoding UTF8
+        }
+    }
+
+    $psArgs = @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", "`"$scriptPath`"",
+        "-Repo", $Repo,
+        "-ReleaseTag", $ReleaseTag,
+        "-Package", $Package,
+        "-Elevated"
+    )
+
+    $proc = Start-Process powershell.exe -Verb RunAs -Wait -PassThru -ArgumentList ($psArgs -join " ")
+    exit $(if ($null -ne $proc.ExitCode) { $proc.ExitCode } else { 0 })
+}
+
+if (-not $Elevated -and -not (Test-IsAdmin)) {
+    Request-Admin
+}
+
+function Write-Step($msg) { Write-Host "[LanMsg] $msg" -ForegroundColor Cyan }
 function Get-AssetNames {
     param([string]$Package)
     switch ($Package) {

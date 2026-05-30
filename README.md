@@ -6,11 +6,13 @@ Authorized computers on the same local network can send encrypted popup messages
 
 ## Install from GitHub (one command)
 
-Open **PowerShell as Administrator** and run:
+Open **PowerShell** (normal window is fine) and run:
 
 ```powershell
 irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1 | iex
 ```
+
+You will get a **UAC Administrator prompt first**, then the download and install begin.
 
 That script will:
 1. Download **LanMsg-Setup-lite.zip** (~5 MB) — fast default
