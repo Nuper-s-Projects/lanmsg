@@ -4,27 +4,38 @@ LanMsg is a production-ready replacement for the Windows `msg` command. It works
 
 Authorized computers on the same local network can send encrypted popup messages with sender identity, priority, reply, and delivery status.
 
-## Share LanMsg with others (easy)
+## Install from GitHub (one command)
 
-**You (once):** build the download zip:
+Open **PowerShell as Administrator** and run:
 
 ```powershell
-cd LanMsg
-powershell -ExecutionPolicy Bypass -File build-release.ps1
+irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1 | iex
 ```
 
-This creates **`dist/LanMsg-Setup.zip`** — upload that file anywhere (Drive, Dropbox, GitHub Releases).
+That script will:
+1. Download the latest **LanMsg-Setup.zip** from GitHub Releases
+2. Extract it automatically
+3. Install LanMsg (service, firewall, tray app, setup wizard)
 
-**Your friends:**  
-1. Download and extract `LanMsg-Setup.zip`  
-2. Double-click **`Install-LanMsg.bat`**  
-3. Click **Yes** (Administrator)  
-4. Enter the same **LAN group code** on each PC  
-5. Click **Test Message**
+No manual zip download. Re-running upgrades the existing install.
 
-Re-running the installer **automatically removes the old LanMsg** and installs the new version (your group code and settings are kept).
+**First time only:** On GitHub go to **Actions → Build and Release → Run workflow** to create the first release zip. After that, the one-liner works for everyone.
 
-No source code, no .NET SDK, no commands — the zip includes everything.
+Install a specific version:
+
+```powershell
+irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1 | iex -ReleaseTag v1.0.0
+```
+
+## Share LanMsg with others (easy)
+
+**Option A — One-liner (recommended):** Share this command:
+
+```powershell
+irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1 | iex
+```
+
+**Option B — Manual zip:** build locally with `build-release.ps1`, upload `dist/LanMsg-Setup.zip` to GitHub Releases, or share the zip file directly.
 
 ## Quick start (on your PC)
 
