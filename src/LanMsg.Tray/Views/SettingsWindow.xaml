@@ -1,0 +1,30 @@
+<Window x:Class="LanMsg.Tray.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="LanMsg Settings"
+        Width="520" Height="560"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+            <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+            <TextBlock Text="Display name" Foreground="{StaticResource MutedBrush}"/>
+            <TextBox x:Name="NameBox" Margin="0,4,0,12"/>
+            <TextBlock Text="LAN group code" Foreground="{StaticResource MutedBrush}"/>
+            <TextBox x:Name="GroupBox" Margin="0,4,0,12"/>
+            <CheckBox x:Name="ReceiveBox" Content="Allow receiving messages" Margin="0,0,0,8"/>
+            <CheckBox x:Name="SoundBox" Content="Play notification sounds" Margin="0,0,0,8"/>
+            <CheckBox x:Name="AllowlistBox" Content="Allowlist only" Margin="0,0,0,8"/>
+            <CheckBox x:Name="DebugBox" Content="Debug logging (may include message metadata)" Margin="0,0,0,12"/>
+            <TextBlock Text="Blocked device IDs (one per line)" Foreground="{StaticResource MutedBrush}"/>
+            <TextBox x:Name="BlockDevicesBox" AcceptsReturn="True" MinHeight="60" Margin="0,4,0,12"/>
+            <TextBlock Text="Blocked IPs (one per line)" Foreground="{StaticResource MutedBrush}"/>
+            <TextBox x:Name="BlockIpsBox" AcceptsReturn="True" MinHeight="60" Margin="0,4,0,16"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Save" Style="{StaticResource AccentBtn}" Margin="0,0,8,0" Click="Save_Click"/>
+                <Button Content="Clear History" Style="{StaticResource PrimaryBtn}" Click="ClearHistory_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
