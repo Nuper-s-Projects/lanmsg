@@ -41,14 +41,14 @@ function Request-Admin {
     $psArgs = @(
         "-NoProfile",
         "-ExecutionPolicy", "Bypass",
-        "-File", "`"$scriptPath`"",
+        "-File", $scriptPath,
         "-Repo", $Repo,
         "-ReleaseTag", $ReleaseTag,
         "-Package", $Package,
         "-Elevated"
     )
 
-    $proc = Start-Process powershell.exe -Verb RunAs -Wait -PassThru -ArgumentList ($psArgs -join " ")
+    $proc = Start-Process powershell.exe -Verb RunAs -Wait -PassThru -ArgumentList $psArgs
     exit $(if ($null -ne $proc.ExitCode) { $proc.ExitCode } else { 0 })
 }
 
