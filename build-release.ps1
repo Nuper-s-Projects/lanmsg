@@ -45,18 +45,38 @@ if (Test-Path $PublishRoot) {
 }
 Build-LanPublish -RepoRoot $RepoRoot -PublishRoot $PublishRoot -SelfContained
 
+Write-LanStep "Building lite release (~5 MB, fast GitHub install)..."
+$PublishLite = Join-Path $RepoRoot "publish-lite"
+Remove-DirRetry $PublishLite | Out-Null
+Build-LanPublish -RepoRoot $RepoRoot -PublishRoot $PublishLite
+
+function Write-SetupPackage {
+    param(
+        [string]$StageRoot,
+        [string]$PublishFrom,
+        [switch]$SelfContained
+    )
+
+    Remove-DirRetry $StageRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $StageRoot, (Join-Path $StageRoot "installer"), (Join-Path $StageRoot "publish") | Out-Null
+    Copy-Item (Join-Path $PublishFrom "Service") (Join-Path $StageRoot "publish\Service") -Recurse -Force
+    Copy-Item (Join-Path $PublishFrom "Tray") (Join-Path $StageRoot "publish\Tray") -Recurse -Force
+    if ($SelfContained) {
+        Copy-Item (Join-Path $PublishFrom ".self-contained") (Join-Path $StageRoot "publish\.self-contained") -Force
+    }
+    Copy-Item (Join-Path $RepoRoot "installer\install.ps1") (Join-Path $StageRoot "installer\") -Force
+    Copy-Item (Join-Path $RepoRoot "installer\uninstall.ps1") (Join-Path $StageRoot "installer\") -Force
+    Copy-Item (Join-Path $RepoRoot "installer\LanMsg-Common.ps1") (Join-Path $StageRoot "installer\") -Force
+    Copy-Item (Join-Path $RepoRoot "Install-LanMsg.bat") (Join-Path $StageRoot "Install-LanMsg.bat") -Force -ErrorAction SilentlyContinue
+}
+
 Write-LanStep "Packaging LanMsg-Setup..."
 New-Item -ItemType Directory -Force -Path $DistRoot | Out-Null
 $StageRoot = New-StageDir $SetupRoot
+Write-SetupPackage -StageRoot $StageRoot -PublishFrom $PublishRoot -SelfContained
 
-New-Item -ItemType Directory -Force -Path $StageRoot, (Join-Path $StageRoot "installer"), (Join-Path $StageRoot "publish") | Out-Null
-
-Copy-Item (Join-Path $PublishRoot "Service") (Join-Path $StageRoot "publish\Service") -Recurse -Force
-Copy-Item (Join-Path $PublishRoot "Tray") (Join-Path $StageRoot "publish\Tray") -Recurse -Force
-Copy-Item (Join-Path $PublishRoot ".self-contained") (Join-Path $StageRoot "publish\.self-contained") -Force
-Copy-Item (Join-Path $RepoRoot "installer\install.ps1") (Join-Path $StageRoot "installer\") -Force
-Copy-Item (Join-Path $RepoRoot "installer\uninstall.ps1") (Join-Path $StageRoot "installer\") -Force
-Copy-Item (Join-Path $RepoRoot "installer\LanMsg-Common.ps1") (Join-Path $StageRoot "installer\") -Force
+$LiteSetupRoot = Join-Path $DistRoot "LanMsg-Setup-lite"
+Write-SetupPackage -StageRoot $LiteSetupRoot -PublishFrom $PublishLite
 
 @'
 @echo off
@@ -110,8 +130,11 @@ Same group code required on all computers.
 '@ | Set-Content (Join-Path $StageRoot "README.txt") -Encoding UTF8
 
 Write-LanStep "Creating zip..."
+$ZipLitePath = Join-Path $DistRoot "LanMsg-Setup-lite.zip"
 if (Test-Path $ZipPath) { Remove-Item $ZipPath -Force -ErrorAction SilentlyContinue }
-Compress-Archive -Path $StageRoot -DestinationPath $ZipPath -Force
+if (Test-Path $ZipLitePath) { Remove-Item $ZipLitePath -Force -ErrorAction SilentlyContinue }
+Compress-Archive -Path $StageRoot -DestinationPath $ZipPath -CompressionLevel Optimal -Force
+Compress-Archive -Path $LiteSetupRoot -DestinationPath $ZipLitePath -CompressionLevel Optimal -Force
 
 if ($StageRoot -ne $SetupRoot) {
     Write-LanStep "Updating dist\LanMsg-Setup folder..."
@@ -124,9 +147,11 @@ if ($StageRoot -ne $SetupRoot) {
 }
 
 $sizeMb = [math]::Round((Get-Item $ZipPath).Length / 1MB, 1)
+$liteMb = [math]::Round((Get-Item $ZipLitePath).Length / 1MB, 1)
 Write-Host ""
 Write-Host "Release ready!" -ForegroundColor Green
-Write-Host "  Zip:    $ZipPath  ($sizeMb MB)"
+Write-Host "  Lite:   $ZipLitePath  ($liteMb MB)  <- default for GitHub install"
+Write-Host "  Full:   $ZipPath  ($sizeMb MB)  <- offline, no .NET needed"
 if (Test-Path $SetupRoot) { Write-Host "  Folder: $SetupRoot" }
 Write-Host ""
-Write-Host "Share LanMsg-Setup.zip with anyone. They extract and double-click Install-LanMsg.bat."
+Write-Host "Share LanMsg-Setup-lite.zip for fast installs, or LanMsg-Setup.zip for fully bundled."

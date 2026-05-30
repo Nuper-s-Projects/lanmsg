@@ -13,13 +13,23 @@ irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/ins
 ```
 
 That script will:
-1. Download the latest **LanMsg-Setup.zip** from GitHub Releases
-2. Extract it automatically
-3. Install LanMsg (service, firewall, tray app, setup wizard)
+1. Download **LanMsg-Setup-lite.zip** (~5 MB) — fast default
+2. Fall back to the full zip (~100 MB) if needed
+3. Use **curl** + direct GitHub URLs (not slow `Invoke-WebRequest`)
+4. Extract with **tar** (faster than Expand-Archive)
+5. Install LanMsg automatically
 
-No manual zip download. Re-running upgrades the existing install.
+No manual zip step. Re-running upgrades the existing install.
 
-**First time only:** On GitHub go to **Actions → Build and Release → Run workflow** to create the first release zip. After that, the one-liner works for everyone.
+Lite installs .NET 6 Desktop Runtime via winget if missing.
+
+Force full offline package (no .NET download later):
+
+```powershell
+iex "& { $(irm https://raw.githubusercontent.com/Nuper-s-Projects/lanmsg/main/installer/install-from-github.ps1) } -Package full"
+```
+
+**First time only:** On GitHub go to **Actions → Build and Release → Run workflow** to create the first release zips.
 
 Install a specific version:
 
