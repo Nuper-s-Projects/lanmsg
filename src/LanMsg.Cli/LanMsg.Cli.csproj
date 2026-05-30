@@ -1,14 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>LanMsg.Tray</RootNamespace>
-    <AssemblyName>LanMsg.Tray</AssemblyName>
-    <ApplicationIcon></ApplicationIcon>
+    <AssemblyName>lanmsg</AssemblyName>
+    <RootNamespace>LanMsg.Cli</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\LanMsg.Client\LanMsg.Client.csproj" />

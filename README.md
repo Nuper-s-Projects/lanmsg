@@ -62,10 +62,49 @@ powershell -ExecutionPolicy Bypass -File installer\install.ps1
 3. Click **Test Message**.
 4. Open **Sender** from the tray icon and send messages.
 
+## CLI (`lanmsg`)
+
+After install, `lanmsg.exe` lives in `C:\Program Files\LanMsg\`. Open PowerShell and run:
+
+```powershell
+& "C:\Program Files\LanMsg\lanmsg.exe" help
+```
+
+Every tray feature has a CLI equivalent:
+
+| GUI | CLI |
+|-----|-----|
+| Setup wizard | `lanmsg setup --code "mygroup" --name "Alice on PC"` |
+| Sender / broadcast | `lanmsg send --body "Hello" --broadcast` |
+| Device list | `lanmsg devices` |
+| Test message | `lanmsg test` |
+| Toggle receiving | `lanmsg receive toggle` |
+| Settings | `lanmsg config get` / `lanmsg config set --receive off` |
+| Group code | `lanmsg group set "mygroup"` |
+| History | `lanmsg history list` |
+| Inbound popups | `lanmsg watch` (prints messages; use tray for popups) |
+| Open GUI | `lanmsg tray --sender` |
+
+Examples:
+
+```powershell
+lanmsg devices
+lanmsg send --body "Meeting in 5 min" --device abc123 --priority important
+lanmsg send --body "Hello" --host 192.168.1.50
+lanmsg reply --to 192.168.1.50 --body "On my way"
+lanmsg receive off
+lanmsg config set --sounds off --block-ips 192.168.1.99
+lanmsg history list --limit 50
+lanmsg watch
+```
+
+Add `--json` on any command for script-friendly output.
+
 ## Features
 
 - Windows Service for always-on receive + UDP discovery
-- WPF tray app for sending, popups, settings, and history
+- **GUI (tray app)** — sender, popups, settings, history, setup wizard
+- **CLI (`lanmsg.exe`)** — full parity with the GUI from PowerShell or scripts
 - AES-256-GCM encryption + HMAC authentication
 - Shared LAN group code (PBKDF2-derived keys)
 - Blocklist / allowlist, rate limiting, receive toggle
@@ -80,10 +119,12 @@ powershell -ExecutionPolicy Bypass -File installer\install.ps1
 │  LanMsg.Tray    │◄────────────────────►│ LanMsg.Service   │
 │  (user session) │                      │ (Windows Service)│
 │  popups + UI    │                      │ TCP 9848 + UDP   │
-└─────────────────┘                      │ 9847 discovery   │
-                                         └────────┬─────────┘
-                                                  │ LAN
-                                         ┌────────▼─────────┐
+└────────┬────────┘                      │ 9847 discovery   │
+         │                               └────────┬─────────┘
+┌────────▼────────┐                                │ LAN
+│  lanmsg.exe CLI │◄──── same IPC ────────────────┤
+│  (scripts/term) │                                │
+└─────────────────┘                      ┌────────▼─────────┐
                                          │  Other LanMsg PCs│
                                          └──────────────────┘
 ```
@@ -126,6 +167,7 @@ cd LanMsg
 dotnet build LanMsg.sln -c Release
 dotnet publish src/LanMsg.Service/LanMsg.Service.csproj -c Release -r win-x64 --self-contained false -o publish/Service
 dotnet publish src/LanMsg.Tray/LanMsg.Tray.csproj -c Release -r win-x64 --self-contained false -o publish/Tray
+dotnet publish src/LanMsg.Cli/LanMsg.Cli.csproj -c Release -r win-x64 --self-contained false -o publish/Cli
 ```
 
 ### Dev run (no install)

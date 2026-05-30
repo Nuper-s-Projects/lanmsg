@@ -1,10 +1,9 @@
 using System.IO;
-using System.Text.Json;
 using LanMsg.Core.Config;
 using LanMsg.Core.Models;
 using Microsoft.Data.Sqlite;
 
-namespace LanMsg.Tray.History;
+namespace LanMsg.Client;
 
 public sealed class HistoryStore : IDisposable
 {

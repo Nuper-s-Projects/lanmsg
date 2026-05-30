@@ -2,8 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using LanMsg.Core.Models;
 using LanMsg.Ipc;
-using LanMsg.Tray.History;
-using LanMsg.Tray.Services;
+using LanMsg.Client;
 
 namespace LanMsg.Tray.Views;
 

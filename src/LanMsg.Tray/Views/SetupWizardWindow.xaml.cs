@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using LanMsg.Core.Config;
 using LanMsg.Core.Models;
 using LanMsg.Ipc;
-using LanMsg.Tray.Services;
+using LanMsg.Client;
 
 namespace LanMsg.Tray.Views;
 

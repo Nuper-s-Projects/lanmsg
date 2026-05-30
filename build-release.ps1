@@ -61,6 +61,7 @@ function Write-SetupPackage {
     New-Item -ItemType Directory -Force -Path $StageRoot, (Join-Path $StageRoot "installer"), (Join-Path $StageRoot "publish") | Out-Null
     Copy-Item (Join-Path $PublishFrom "Service") (Join-Path $StageRoot "publish\Service") -Recurse -Force
     Copy-Item (Join-Path $PublishFrom "Tray") (Join-Path $StageRoot "publish\Tray") -Recurse -Force
+    Copy-Item (Join-Path $PublishFrom "Cli") (Join-Path $StageRoot "publish\Cli") -Recurse -Force
     if ($SelfContained) {
         Copy-Item (Join-Path $PublishFrom ".self-contained") (Join-Path $StageRoot "publish\.self-contained") -Force
     }

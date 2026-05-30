@@ -3,9 +3,8 @@ using System.Windows;
 using LanMsg.Core.Config;
 using LanMsg.Core.Models;
 using LanMsg.Ipc;
+using LanMsg.Client;
 using LanMsg.Tray.Helpers;
-using LanMsg.Tray.History;
-using LanMsg.Tray.Services;
 using LanMsg.Tray.Views;
 using Forms = System.Windows.Forms;
 

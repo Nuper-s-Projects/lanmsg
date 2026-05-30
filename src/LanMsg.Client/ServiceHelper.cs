@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.ServiceProcess;
 using LanMsg.Core.Logging;
 
-namespace LanMsg.Tray.Services;
+namespace LanMsg.Client;
 
 public static class ServiceHelper
 {

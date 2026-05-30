@@ -1,5 +1,5 @@
 using System.Windows;
-using LanMsg.Tray.History;
+using LanMsg.Client;
 
 namespace LanMsg.Tray.Views;
 

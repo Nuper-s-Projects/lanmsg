@@ -3,7 +3,7 @@ using System.IO.Pipes;
 using LanMsg.Core.Logging;
 using LanMsg.Ipc;
 
-namespace LanMsg.Tray.Services;
+namespace LanMsg.Client;
 
 public sealed class IpcClient : IDisposable
 {

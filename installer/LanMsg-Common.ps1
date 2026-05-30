@@ -10,7 +10,8 @@ function Test-LanWindows {
 function Test-LanPublishReady($PublishRoot) {
     $svc = Join-Path $PublishRoot "Service\LanMsg.Service.exe"
     $tray = Join-Path $PublishRoot "Tray\LanMsg.Tray.exe"
-    return (Test-Path $svc) -and (Test-Path $tray)
+    $cli = Join-Path $PublishRoot "Cli\lanmsg.exe"
+    return (Test-Path $svc) -and (Test-Path $tray) -and (Test-Path $cli)
 }
 
 function Test-LanSelfContained($PublishRoot) {
@@ -54,6 +55,8 @@ function Build-LanPublish {
     if ($LASTEXITCODE -ne 0) { Pop-Location; throw "Service publish failed." }
     & dotnet publish src/LanMsg.Tray/LanMsg.Tray.csproj -c Release -r win-x64 --self-contained $sc -o (Join-Path $PublishRoot "Tray")
     if ($LASTEXITCODE -ne 0) { Pop-Location; throw "Tray publish failed." }
+    & dotnet publish src/LanMsg.Cli/LanMsg.Cli.csproj -c Release -r win-x64 --self-contained $sc -o (Join-Path $PublishRoot "Cli")
+    if ($LASTEXITCODE -ne 0) { Pop-Location; throw "CLI publish failed." }
     Pop-Location
 
     if ($SelfContained) {
@@ -145,7 +148,14 @@ function Install-LanMsg {
     Copy-Item (Join-Path $PublishRoot "Tray\LanMsg.Tray.dll") $InstallDir -Force
     Copy-Item (Join-Path $PublishRoot "Tray\LanMsg.Tray.runtimeconfig.json") $InstallDir -Force -ErrorAction SilentlyContinue
     Copy-Item (Join-Path $PublishRoot "Tray\LanMsg.Tray.deps.json") $InstallDir -Force -ErrorAction SilentlyContinue
+    Copy-Item (Join-Path $PublishRoot "Cli\lanmsg.exe") $InstallDir -Force
+    Copy-Item (Join-Path $PublishRoot "Cli\lanmsg.dll") $InstallDir -Force -ErrorAction SilentlyContinue
+    Copy-Item (Join-Path $PublishRoot "Cli\lanmsg.runtimeconfig.json") $InstallDir -Force -ErrorAction SilentlyContinue
+    Copy-Item (Join-Path $PublishRoot "Cli\lanmsg.deps.json") $InstallDir -Force -ErrorAction SilentlyContinue
     Get-ChildItem (Join-Path $PublishRoot "Tray") -Filter "*.dll" | ForEach-Object {
+        Copy-Item $_.FullName $InstallDir -Force
+    }
+    Get-ChildItem (Join-Path $PublishRoot "Cli") -Filter "*.dll" | ForEach-Object {
         Copy-Item $_.FullName $InstallDir -Force
     }
 
@@ -201,6 +211,11 @@ function Install-LanMsg {
     $lnk2.Arguments = "--settings"
     $lnk2.WorkingDirectory = $InstallDir
     $lnk2.Save()
+
+    $lnkCli = $shell.CreateShortcut((Join-Path $lanMsgMenu "LanMsg CLI.lnk"))
+    $lnkCli.TargetPath = Join-Path $InstallDir "lanmsg.exe"
+    $lnkCli.WorkingDirectory = $InstallDir
+    $lnkCli.Save()
 
     $lnk3 = $shell.CreateShortcut((Join-Path $lanMsgMenu "Uninstall LanMsg.lnk"))
     $lnk3.TargetPath = "powershell.exe"
